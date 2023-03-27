@@ -1,3 +1,4 @@
 node_modules/
 .env
-treeattle.json
+.DS_Store
+treeattle*.geojson

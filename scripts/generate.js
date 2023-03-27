@@ -1,12 +1,32 @@
 import parser from "csv-parser";
 import geojson from "geojson";
+import gp from "geojson-precision";
 import fs from "fs";
 
 const args = process.argv.slice(2);
 const csvPath = args[0];
 
-const features = [];
-let lineCount = 0;
+const TOP_GENUS = [
+  "Acer",
+  "Prunus",
+  "Crataegus",
+  "Malus",
+  "Quercus",
+  "Fraxinus",
+  "Pyrus",
+  "Tilia",
+  "Cornus",
+  "Liquidambar",
+  "Betula",
+  "Amelanchier",
+  "Carpnius",
+  "Ulmus",
+  "Platanus",
+];
+const topFeatures = [];
+const otherFeatures = [];
+let topLineCount = 0;
+let otherLineCount = 0;
 
 fs.createReadStream(csvPath)
   .on("error", () => {
@@ -28,17 +48,22 @@ fs.createReadStream(csvPath)
         "UNITDESC",
       ],
     });
-    features.push(feature);
-    lineCount++;
+    if (TOP_GENUS.includes(row.GENUS)) {
+      topFeatures.push(gp.parse(feature, 6));
+      topLineCount++;
+    } else {
+      otherFeatures.push(gp.parse(feature, 6));
+      otherLineCount++;
+    }
   })
   .on("end", async () => {
-    console.log("Writing GeoJSON to file...");
-    const featureCollection = { type: "FeatureCollection", features };
-    await fs.writeFile(
-      "treeattle.geojson",
-      JSON.stringify(featureCollection),
-      "utf8",
-      () => {}
-    );
-    console.log(`Wrote ${lineCount} rows to treattle.geojson`);
+    console.log("Writing GeoJSON to files...");
+    const topFeatureCollection = { type: "FeatureCollection", features: topFeatures };
+    const otherFeatureCollection = { type: "FeatureCollection", features: otherFeatures };
+    await Promise.all([
+      fs.writeFile("treeattle_top.geojson", JSON.stringify(topFeatureCollection), "utf8", () => {}),
+      fs.writeFile("treeattle_other.geojson", JSON.stringify(otherFeatureCollection), "utf8", () => {}),
+    ]);
+    console.log(`Wrote ${topLineCount} rows to treattle_top.geojson`);
+    console.log(`Wrote ${otherLineCount} rows to treattle_other.geojson`);
   });
