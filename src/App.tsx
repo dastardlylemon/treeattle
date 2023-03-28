@@ -1,5 +1,6 @@
 import "./App.css";
 import { MantineProvider } from "@mantine/core";
+import { FilterContextProvider } from "./components/FilterContext";
 import Map from "./components/Map";
 import ControlPanel from "./components/ControlPanel";
 
@@ -10,10 +11,12 @@ function App() {
       withNormalizeCSS
       theme={{ primaryColor: "lime" }}
     >
-      <div className="App">
-        <ControlPanel />
-        <Map />
-      </div>
+      <FilterContextProvider>
+        <div className="App">
+          <ControlPanel />
+          <Map />
+        </div>
+      </FilterContextProvider>
     </MantineProvider>
   );
 }

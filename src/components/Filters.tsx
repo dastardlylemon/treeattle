@@ -1,7 +1,6 @@
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import {
   Button,
-  Group,
   MultiSelect,
   SegmentedControl,
   Space,
@@ -9,24 +8,8 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
-
-enum Genus {
-  ACER = "Acer",
-  PRUNUS = "Prunus",
-  CRATAEGUS = "Crataegus",
-  MALUS = "Malus",
-  QUERCUS = "Quercus",
-  FRAXINUS = "Fraxinus",
-  PYRUS = "Pyrus",
-  TILIA = "Tilia",
-  CORNUS = "Cornus",
-  LIQUIDAMBAR = "Liquidambar",
-  BETULA = "Betula",
-  AMELANCHIER = "Amelanchier",
-  CARPNIUS = "Carpnius",
-  ULMUS = "Ulmus",
-  PLATANUS = "Platanus",
-}
+import { Genus, Owner } from "../types/filters";
+import { useFilterContext } from "./FilterContext";
 
 const genusOptions = [
   { label: Genus.ACER, value: Genus.ACER, description: "Maple" },
@@ -54,6 +37,12 @@ const genusOptions = [
   { label: Genus.PLATANUS, value: Genus.PLATANUS, description: "Sycamore" },
 ];
 
+const ownerOptions = [
+  { label: "All", value: Owner.ALL },
+  { label: "SDOT", value: Owner.SDOT },
+  { label: "Private", value: Owner.PRIVATE },
+];
+
 interface ItemProps extends React.ComponentPropsWithoutRef<"div"> {
   label: string;
   value: string;
@@ -75,6 +64,25 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
 
 export default function Filters() {
   const theme = useMantineTheme();
+  const { genuses, setGenuses, owner, setOwner } = useFilterContext();
+
+  const [localGenuses, setLocalGenuses] = useState(genuses);
+  const [localOwner, setLocalOwner] = useState(owner);
+
+  useEffect(() => {
+    setLocalGenuses(genuses);
+    setLocalOwner(owner);
+  }, [genuses, owner]);
+
+  const onUpdateFilters = () => {
+    setGenuses(localGenuses);
+    setOwner(localOwner);
+  };
+
+  const onReset = () => {
+    setLocalGenuses(genuses);
+    setLocalOwner(owner);
+  };
 
   return (
     <>
@@ -83,23 +91,29 @@ export default function Filters() {
         defaultValue={Object.values(Genus)}
         itemComponent={SelectItem}
         label="Genuses"
+        onChange={(values) => setLocalGenuses(values as Genus[])}
         placeholder="Select genuses to filter on"
         searchable
         styles={{ label: { color: theme.colors.dark[5] } }}
+        value={localGenuses}
       />
       <Space h="md" />
       <Text fz="sm" fw={500} color="dark.5">
         Ownership
       </Text>
       <SegmentedControl
-        data={["All", "SDOT", "Private"]}
-        defaultValue="All"
+        data={ownerOptions}
+        defaultValue={Owner.ALL}
+        onChange={(value) => setLocalOwner(value as Owner)}
+        value={localOwner}
         fullWidth
       />
       <Space h="md" />
       <SimpleGrid cols={2} spacing="sm">
-        <Button variant="outline">Reset</Button>
-        <Button>Update</Button>
+        <Button onClick={onReset} variant="outline">
+          Reset
+        </Button>
+        <Button onClick={onUpdateFilters}>Update</Button>
       </SimpleGrid>
     </>
   );
