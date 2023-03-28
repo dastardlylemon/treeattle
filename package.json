@@ -4,11 +4,7 @@
   "description": "",
   "main": "index.tsx",
   "scripts": {
-    "start": "PORT=3206 react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "generate": "scripts/generate.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "type": "module",
   "author": "",
@@ -20,16 +16,20 @@
     "csv-parser": "^3.0.0",
     "geojson": "^0.5.0",
     "geojson-precision": "^1.0.0",
-    "maplibre-gl": "^2.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.7"
+  },
+  "scripts": {
+    "start": "PORT=3206 react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "generate": "node scripts/generate.js"
   },
   "eslintConfig": {
     "extends": [

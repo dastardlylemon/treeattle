@@ -58,11 +58,27 @@ fs.createReadStream(csvPath)
   })
   .on("end", async () => {
     console.log("Writing GeoJSON to files...");
-    const topFeatureCollection = { type: "FeatureCollection", features: topFeatures };
-    const otherFeatureCollection = { type: "FeatureCollection", features: otherFeatures };
+    const topFeatureCollection = {
+      type: "FeatureCollection",
+      features: topFeatures,
+    };
+    const otherFeatureCollection = {
+      type: "FeatureCollection",
+      features: otherFeatures,
+    };
     await Promise.all([
-      fs.writeFile("treeattle_top.geojson", JSON.stringify(topFeatureCollection), "utf8", () => {}),
-      fs.writeFile("treeattle_other.geojson", JSON.stringify(otherFeatureCollection), "utf8", () => {}),
+      fs.writeFile(
+        "./data/treeattle_top.geojson",
+        JSON.stringify(topFeatureCollection),
+        "utf8",
+        () => {}
+      ),
+      fs.writeFile(
+        "./data/treeattle_other.geojson",
+        JSON.stringify(otherFeatureCollection),
+        "utf8",
+        () => {}
+      ),
     ]);
     console.log(`Wrote ${topLineCount} rows to treattle_top.geojson`);
     console.log(`Wrote ${otherLineCount} rows to treattle_other.geojson`);

@@ -37,6 +37,10 @@ export default function Map() {
       center: [-122.3517, 47.6219],
       zoom: 14,
     });
+    map.current.addControl(
+      new maplibregl.NavigationControl({ showZoom: true }),
+      "top-right"
+    );
   }, []);
 
   return (
