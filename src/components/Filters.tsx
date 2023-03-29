@@ -90,9 +90,9 @@ export default function Filters() {
         data={genusOptions}
         defaultValue={Object.values(Genus)}
         itemComponent={SelectItem}
-        label="Genuses"
+        label="Genera"
         onChange={(values) => setLocalGenuses(values as Genus[])}
-        placeholder="Select genuses to filter on"
+        placeholder="Select genera to filter on"
         searchable
         styles={{ label: { color: theme.colors.dark[5] } }}
         value={localGenuses}

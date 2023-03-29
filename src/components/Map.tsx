@@ -1,11 +1,12 @@
 import { useRef, useEffect, useState } from "react";
-import { useMantineTheme } from "@mantine/core";
+import { renderToString } from "react-dom/server";
+import { useMantineTheme, LoadingOverlay } from "@mantine/core";
 import maplibregl, {
   Map as GLMap,
   ExpressionSpecification,
   StyleSpecification,
 } from "maplibre-gl";
-import { LoadingOverlay } from "@mantine/core";
+import MapPopup from "./MapPopup";
 import { useFilterContext } from "./FilterContext";
 import { Owner } from "../types/filters";
 import "./map.css";
@@ -39,6 +40,7 @@ export default function Map() {
 
   const { genuses, owner } = useFilterContext();
 
+  // initialize map
   useEffect(() => {
     if (map.current) {
       return;
@@ -57,6 +59,7 @@ export default function Map() {
     map.current.on("load", () => setIsMapLoading(false));
   }, []);
 
+  // initialize data from geojson
   useEffect(() => {
     if (!isMapLoading) {
       setIsDataLoading(true);
@@ -68,7 +71,11 @@ export default function Map() {
       })
         .then((res) => res.json())
         .then((data) => {
-          map.current?.addSource("topTreesSource", { type: "geojson", data });
+          map.current?.addSource("topTreesSource", {
+            type: "geojson",
+            data,
+            generateId: true,
+          });
           map.current?.addLayer({
             id: "topTrees",
             type: "circle",
@@ -86,6 +93,7 @@ export default function Map() {
     }
   }, [theme, isMapLoading]);
 
+  // apply filters
   useEffect(() => {
     if (map.current && !isMapLoading) {
       const filters: ExpressionSpecification[] = [];
@@ -98,6 +106,63 @@ export default function Map() {
       map.current.setFilter("topTrees", ["all", ...filters]);
     }
   }, [genuses, owner, isMapLoading]);
+
+  // initialize mouse behavior
+  useEffect(() => {
+    if (map.current && !isMapLoading) {
+      map.current.on("mouseover", "topTrees", () => {
+        if (map.current) {
+          map.current.getCanvas().style.cursor = "pointer";
+        }
+      });
+      map.current.on("mouseleave", "topTrees", () => {
+        if (map.current) {
+          map.current.getCanvas().style.cursor = "";
+        }
+      });
+
+      map.current.on("click", "topTrees", (e) => {
+        if (map.current && e.features) {
+          const coords = (e.features[0].geometry as any).coordinates.slice();
+          const {
+            COMMON_NAME: commonName,
+            SCIENTIFIC_NAME: scientificName,
+            DIAM: diameter,
+            HERITAGE: heritage,
+            OWNERSHIP: ownership,
+            PLANTED_DATE: plantedDate,
+            UNITDESC: location,
+            UNITID: id,
+          } = e.features[0].properties as any;
+
+          // Ensure that if the map is zoomed out such that multiple
+          // copies of the feature are visible, the popup appears
+          // over the copy being pointed to.
+          while (Math.abs(e.lngLat.lng - coords[0]) > 180) {
+            coords[0] += e.lngLat.lng > coords[0] ? 360 : -360;
+          }
+
+          const popup = (
+            <MapPopup
+              commonName={commonName}
+              scientificName={scientificName}
+              diameter={diameter}
+              heritage={heritage}
+              ownership={ownership}
+              plantedDate={plantedDate}
+              location={location}
+              id={id}
+            />
+          );
+
+          new maplibregl.Popup({ closeButton: false })
+            .setLngLat(coords)
+            .setHTML(renderToString(popup))
+            .addTo(map.current);
+        }
+      });
+    }
+  }, [isMapLoading]);
 
   return (
     <div className="map-wrapper">
