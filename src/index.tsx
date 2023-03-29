@@ -1,5 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "@fontsource/work-sans/400.css";
+import "@fontsource/work-sans/400-italic.css";
+import "@fontsource/work-sans/500.css";
+import "@fontsource/work-sans/700.css";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";

@@ -9,7 +9,11 @@ function App() {
     <MantineProvider
       withGlobalStyles
       withNormalizeCSS
-      theme={{ primaryColor: "lime" }}
+      theme={{
+        primaryColor: "lime",
+        fontFamily: "Work Sans, sans-serif",
+        headings: { fontFamily: "Work Sans, sans-serif" },
+      }}
     >
       <FilterContextProvider>
         <div className="App">

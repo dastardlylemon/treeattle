@@ -30,6 +30,9 @@ type MapPopupProps = {
   id: string;
 };
 
+// this is rendered outside of the theme provider, so we have to add manually
+const typographyStyle = { fontFamily: "Work Sans, sans-serif" };
+
 function DataCell({
   icon,
   label,
@@ -45,10 +48,18 @@ function DataCell({
         {icon}
       </ThemeIcon>
       <div>
-        <Text tt="uppercase" fz="xs" c="dimmed">
+        <Text
+          tt="uppercase"
+          size="0.7rem"
+          fw="500"
+          c="dimmed"
+          sx={typographyStyle}
+        >
           {label}
         </Text>
-        <Text fz="sm">{value}</Text>
+        <Text fz="sm" fw="500" sx={typographyStyle}>
+          {value}
+        </Text>
       </div>
     </Group>
   );
@@ -67,12 +78,14 @@ export default function MapPopup({
   return (
     <Paper shadow="md" p="md" radius="md" style={{ minWidth: 300 }}>
       <div>
-        <Badge color="lime" size="sm">
+        <Badge color="lime" size="sm" sx={typographyStyle}>
           {id}
         </Badge>
         <Space h="xs" />
-        <Title order={4}>{commonName}</Title>
-        <Text fs="italic" c="dimmed">
+        <Title order={3} sx={typographyStyle}>
+          {commonName}
+        </Title>
+        <Text fs="italic" c="dimmed" sx={typographyStyle}>
           {scientificName}
         </Text>
       </div>
@@ -89,7 +102,7 @@ export default function MapPopup({
           <DataCell
             icon={<IconRulerMeasure />}
             label="Diameter"
-            value={diameter}
+            value={`${diameter}"`}
           />
         </Grid.Col>
         <Grid.Col span={6}>
