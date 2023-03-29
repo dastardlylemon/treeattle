@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import {
   Badge,
+  Box,
   Divider,
   Grid,
   Group,
@@ -47,7 +48,7 @@ function DataCell({
       <ThemeIcon size="sm" variant="light" color="lime">
         {icon}
       </ThemeIcon>
-      <div>
+      <Box sx={{ flex: 1}}>
         <Text
           tt="uppercase"
           size="0.7rem"
@@ -60,7 +61,7 @@ function DataCell({
         <Text fz="sm" fw="500" sx={typographyStyle}>
           {value}
         </Text>
-      </div>
+      </Box>
     </Group>
   );
 }

@@ -95,7 +95,16 @@ export default function Map() {
             type: "circle",
             source: "topTreesSource",
             paint: {
-              "circle-radius": 3,
+              // interpolate radius between 3 at 9 zoom and 10 at 17 zoom
+              "circle-radius": [
+                "interpolate",
+                ["exponential", 2],
+                ["zoom"],
+                9,
+                3,
+                17,
+                10,
+              ],
               "circle-color": theme.colors.lime[5],
               "circle-stroke-color": theme.colors.lime[7],
               "circle-stroke-width": 1,
