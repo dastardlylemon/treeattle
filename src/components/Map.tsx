@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useCallback, useRef, useEffect, useState } from "react";
 import { renderToString } from "react-dom/server";
 import { useMantineTheme, LoadingOverlay } from "@mantine/core";
 import maplibregl, {
@@ -16,10 +16,11 @@ const style = {
   sources: {
     osm: {
       type: "raster",
-      tiles: ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
+      tiles: ["https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png"],
       tileSize: 256,
-      attribution: "&copy; OpenStreetMap Contributors",
-      maxzoom: 19,
+      attribution:
+        'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
+      maxzoom: 20,
     },
   },
   layers: [
@@ -50,6 +51,8 @@ export default function Map() {
       container: mapContainer.current ?? "",
       style,
       center: [-122.3517, 47.6219],
+      maxZoom: 17,
+      minZoom: 9,
       zoom: 11,
     });
     map.current.addControl(
@@ -58,6 +61,16 @@ export default function Map() {
     );
     map.current.on("load", () => setIsMapLoading(false));
   }, []);
+
+  const getFilters = useCallback(() => {
+    const filters: ExpressionSpecification[] = [];
+    filters.push(["in", ["get", "GENUS"], ["literal", genuses]]);
+
+    if (owner !== Owner.ALL) {
+      filters.push(["==", ["get", "OWNERSHIP"], owner]);
+    }
+    return filters;
+  }, [genuses, owner]);
 
   // initialize data from geojson
   useEffect(() => {
@@ -71,6 +84,7 @@ export default function Map() {
       })
         .then((res) => res.json())
         .then((data) => {
+          const filters = getFilters();
           map.current?.addSource("topTreesSource", {
             type: "geojson",
             data,
@@ -86,6 +100,7 @@ export default function Map() {
               "circle-stroke-color": theme.colors.lime[7],
               "circle-stroke-width": 1,
             },
+            filter: ["all", ...filters],
           });
           setIsDataLoading(false);
         })
@@ -96,16 +111,12 @@ export default function Map() {
   // apply filters
   useEffect(() => {
     if (map.current && !isMapLoading) {
-      const filters: ExpressionSpecification[] = [];
-      filters.push(["in", ["get", "GENUS"], ["literal", genuses]]);
-
-      if (owner !== Owner.ALL) {
-        filters.push(["==", ["get", "OWNERSHIP"], owner]);
+      if (map.current.getLayer("topTrees")) {
+        const filters = getFilters();
+        map.current.setFilter("topTrees", ["all", ...filters]);
       }
-
-      map.current.setFilter("topTrees", ["all", ...filters]);
     }
-  }, [genuses, owner, isMapLoading]);
+  }, [getFilters, isMapLoading]);
 
   // initialize mouse behavior
   useEffect(() => {

@@ -11,7 +11,11 @@ interface FilterContextValue {
 const FilterContext = createContext<FilterContextValue | undefined>(undefined);
 
 function FilterContextProvider({ children }: { children?: ReactNode }) {
-  const [genuses, setGenuses] = useState(Object.values(Genus));
+  const [genuses, setGenuses] = useState([
+    Genus.ACER,
+    Genus.PRUNUS,
+    Genus.CRATAEGUS,
+  ]);
   const [owner, setOwner] = useState(Owner.ALL);
   return (
     <FilterContext.Provider value={{ genuses, setGenuses, owner, setOwner }}>

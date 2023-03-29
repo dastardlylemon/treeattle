@@ -6,7 +6,6 @@ export default function ControlPanel() {
   return (
     <Box
       sx={(theme) => ({
-        height: "100vh",
         padding: theme.spacing.md,
         position: "absolute",
         width: 400,
