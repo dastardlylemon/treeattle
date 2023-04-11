@@ -21,3 +21,9 @@ export enum Owner {
   SDOT = "SDOT",
   PRIVATE = "PRIV",
 }
+
+export enum PresetFilter {
+  HANAMI = "hanami",
+  FALL_COLORS = "fall",
+  TOP_FIVE = "tfive",
+}

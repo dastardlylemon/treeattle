@@ -95,13 +95,13 @@ export default function Map() {
             type: "circle",
             source: "topTreesSource",
             paint: {
-              // interpolate radius between 3 at 9 zoom and 10 at 17 zoom
+              // interpolate radius between 2 at 9 zoom and 10 at 17 zoom
               "circle-radius": [
                 "interpolate",
                 ["exponential", 2],
                 ["zoom"],
                 9,
-                3,
+                2,
                 17,
                 10,
               ],

@@ -1,14 +1,18 @@
 import { forwardRef, useEffect, useState } from "react";
 import {
+  Box,
   Button,
+  Divider,
+  Group,
   MultiSelect,
   SegmentedControl,
+  Select,
   Space,
   SimpleGrid,
   Text,
   useMantineTheme,
 } from "@mantine/core";
-import { Genus, Owner } from "../types/filters";
+import { Genus, Owner, PresetFilter } from "../types/filters";
 import { useFilterContext } from "./FilterContext";
 
 const genusOptions = [
@@ -37,6 +41,22 @@ const genusOptions = [
   { label: Genus.PLATANUS, value: Genus.PLATANUS, description: "Sycamore" },
 ];
 
+const presetOptions = [
+  {
+    label: "Popular",
+    value: PresetFilter.TOP_FIVE,
+    description: "Top five most frequent genera",
+    icon: "🏆",
+  },
+  {
+    label: "Cherry blossoms",
+    value: PresetFilter.HANAMI,
+    icon: "🌸",
+    description: "Seven genera of flowering cherry trees",
+  },
+  { label: "Fall colors", value: PresetFilter.FALL_COLORS, icon: "🍁" },
+];
+
 const ownerOptions = [
   { label: "All", value: Owner.ALL },
   { label: "SDOT", value: Owner.SDOT },
@@ -46,19 +66,23 @@ const ownerOptions = [
 interface ItemProps extends React.ComponentPropsWithoutRef<"div"> {
   label: string;
   value: string;
+  icon?: string;
   description?: string;
 }
 
 const SelectItem = forwardRef<HTMLDivElement, ItemProps>(
-  ({ label, description, ...rest }: ItemProps, ref) => (
-    <div ref={ref} {...rest}>
-      <Text>{label}</Text>
-      {description && (
-        <Text size="xs" color="dimmed">
-          {description}
-        </Text>
-      )}
-    </div>
+  ({ label, description, icon, ...rest }: ItemProps, ref) => (
+    <Group ref={ref} {...rest}>
+      {icon}
+      <Box>
+        <Text>{label}</Text>
+        {description && (
+          <Text size="xs" color="dimmed">
+            {description}
+          </Text>
+        )}
+      </Box>
+    </Group>
   )
 );
 
@@ -86,6 +110,13 @@ export default function Filters() {
 
   return (
     <>
+      <Select
+        data={presetOptions}
+        label="Choose a preset"
+        clearable
+        itemComponent={SelectItem}
+      />
+      <Divider my="md" label="or" labelPosition="center" />
       <MultiSelect
         data={genusOptions}
         defaultValue={Object.values(Genus)}
@@ -108,7 +139,7 @@ export default function Filters() {
         value={localOwner}
         fullWidth
       />
-      <Space h="md" />
+      <Space h="lg" />
       <SimpleGrid cols={2} spacing="sm">
         <Button onClick={onReset} variant="outline">
           Reset
